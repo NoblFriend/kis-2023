@@ -1,9 +1,11 @@
 import tkinter as tk
+import os
 from tkinter import ttk
 from tkinter import simpledialog
 from modules.characters import Character
 from datetime import datetime
 from tkcalendar import Calendar
+from tkintermapview import TkinterMapView
 
 
 class GandalfApp:
@@ -153,7 +155,29 @@ class GandalfApp:
         ttk.Button(dialog, text="Add", command=add_geotag).grid(
             row=5, columnspan=4)
 
-        
     def show_map_popup(self):
-        # Placeholder
-        print("Show Map clicked")
+
+        self.map_widget = TkinterMapView(
+            width=800, 
+            height=600, 
+            corner_radius=0, 
+            max_zoom=15, 
+            database_path="database/offline_tiles.db"
+        )
+        self.map_widget.grid(row=0, column=0, columnspan=3, sticky="nsew")
+
+        close_button = tk.Button(self.map_widget, text="Close", command=self.map_widget.destroy)
+        close_button.grid(row=0, column=1)
+
+        
+        characters = self.db.get_characters()
+        for char in characters:
+            geotags = self.db.get_geotags(char.id)
+            
+            for geotag in geotags:
+                marker = self.map_widget.set_position(geotag['latitude'], geotag['longitude'], marker=True)
+                marker.text = char.name + ' ' + geotag['timestamp']
+            
+            if len(geotags) > 1:
+                positions = [(geotag['latitude'], geotag['longitude']) for geotag in geotags]
+                self.map_widget.set_path(positions)
