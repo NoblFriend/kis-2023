@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import Optional, List, Dict
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -16,7 +16,7 @@ def none_to_default_str(field: str) -> str:
 @dataclass
 class Character:
     name: str
-    id: Optional[UUID] = field(default=None)
+    id: Optional[UUID] = field(default_factory=uuid4)
     
     def __post_init__(self):
         self.name = none_to_default_str(self.name)
@@ -27,7 +27,7 @@ class Geotag:
     timestamp: datetime
     latitude: float
     longitude: float
-    id: Optional[UUID] = field(default=None)
+    id: Optional[UUID] = field(default_factory=uuid4)
     
     def __post_init__(self):
         self.timestamp = _timestamp_validator(self.timestamp)
